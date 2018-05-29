@@ -11,5 +11,37 @@
 
     <artifactId>demo-project</artifactId>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>fr.inria.gforge.spoon</groupId>
+                <artifactId>spoon-maven-plugin</artifactId>
+                <version>3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>ow2.demo.2018</groupId>
+                        <artifactId>demo-spoon</artifactId>
+                        <version>1.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <enableComments>true</enableComments>
+                    <withImports>true</withImports>
+                    <processors>
+                        <processor>
+                            ow2con.processor.APICheckingProcessor
+                        </processor>
+                    </processors>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

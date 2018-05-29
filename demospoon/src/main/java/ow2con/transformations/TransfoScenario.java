@@ -1,6 +1,7 @@
 package ow2con.transformations;
 
 import spoon.MavenLauncher;
+import spoon.compiler.Environment;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtComment;
@@ -23,7 +24,7 @@ public class TransfoScenario {
     @SuppressWarnings("all")
     public static void main(String[] args) {
         MavenLauncher launcher = new MavenLauncher(
-                "path/to/my/project",
+                "demoproject",
                 MavenLauncher.SOURCE_TYPE.APP_SOURCE);
 
         CtModel model = launcher.buildModel();
@@ -50,7 +51,9 @@ public class TransfoScenario {
             CtBlock methodBody = method.getBody();
             List<CtComment> bodyComments = new ArrayList<>();
 
-            for (CtStatement ctStatement : methodBody.getStatements()) {
+            ArrayList<CtStatement> ctStatements = new ArrayList<>(methodBody.getStatements());
+
+            for (CtStatement ctStatement : ctStatements) {
                 String statement = ctStatement.toString();
                 CtComment statementAsComment = factory.createInlineComment(statement);
                 bodyComments.add(statementAsComment);
@@ -73,6 +76,9 @@ public class TransfoScenario {
             }
         }
 
+        Environment environment = launcher.getEnvironment();
+        environment.setCommentEnabled(true);
+        environment.setAutoImports(true);
         launcher.prettyprint();
     }
 }

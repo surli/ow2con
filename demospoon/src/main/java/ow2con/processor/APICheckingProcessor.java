@@ -16,9 +16,9 @@ import java.util.List;
 
 
 public class APICheckingProcessor extends AbstractProcessor<CtMethod> {
-    public static final String PACKAGE_PUBLIC_API = "ow2con.publicapi";
-    public static final String PACKAGE_PRIVATE_API = "ow2con.privateapi";
-    public static final String EXCEPTION_FQN = "ow2con.PrivateAPIException";
+    private static final String PACKAGE_PUBLIC_API = "ow2con.publicapi";
+    private static final String PACKAGE_PRIVATE_API = "ow2con.privateapi";
+    private static final String EXCEPTION_FQN = "ow2con.PrivateAPIException";
 
     @Override
     public boolean isToBeProcessed(CtMethod method) {
@@ -37,13 +37,16 @@ public class APICheckingProcessor extends AbstractProcessor<CtMethod> {
         return false;
     }
 
+    @Override
     public void process(CtMethod method) {
         final Factory factory = method.getFactory();
 
         CtBlock methodBody = method.getBody();
 
         List<CtComment> bodyComments = new ArrayList<>();
-        for (CtStatement ctStatement : methodBody.getStatements()) {
+
+        ArrayList<CtStatement> ctStatements = new ArrayList<>(methodBody.getStatements());
+        for (CtStatement ctStatement : ctStatements) {
             String statement = ctStatement.toString();
             bodyComments.add(factory.createInlineComment(statement));
             methodBody.removeStatement(ctStatement);
@@ -54,13 +57,12 @@ public class APICheckingProcessor extends AbstractProcessor<CtMethod> {
 
         CtThrow throwMyException = factory.createThrow();
         throwMyException.setThrownExpression(myNewException);
-        methodBody.addStatement(0, throwMyException);
+        methodBody.addStatement(throwMyException);
 
         bodyComments.add(factory.createInlineComment("FIXME: The private API type should never be return in a public API."));
 
         for (CtComment bodyComment : bodyComments) {
             throwMyException.addComment(bodyComment);
         }
-
     }
 }
